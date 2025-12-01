@@ -1,0 +1,23 @@
+# Extração de PDF
+docling>=2.4.0
+
+# Embeddings
+sentence-transformers>=2.7.0
+transformers>=4.51.0
+
+# Elasticsearch
+elasticsearch>=8.15.0
+
+# PyTorch (já incluído na imagem base)
+# torch>=2.0.0
+
+# Utilitários
+tqdm>=4.66.0
+pandas>=2.0.0
+numpy>=1.24.0
+python-dotenv
+    
+# Jupyter
+jupyter>=1.0.0
+jupyterlab>=4.0.0
+ipywidgets>=8.0.0
