@@ -1,5 +1,6 @@
 # Extração de PDF
 docling>=2.4.0
+pymupdf>=1.22.5
 
 # Embeddings
 sentence-transformers>=2.7.0

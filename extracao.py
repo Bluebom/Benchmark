@@ -79,7 +79,7 @@ def main():
     DIR_RESULTADOS.mkdir(parents=True, exist_ok=True)
     
     print("=" * 70)
-    print("📄 EXTRAÇÃO DE TEXTO (DOCLING) - H100")
+    print("📄 EXTRAÇÃO DE TEXTO (PyMuPDF)")
     print("=" * 70)
     print(f"   DIR_PDFS: {DIR_PDFS}")
     print(f"   DIR_TEXTOS: {DIR_TEXTOS}")
@@ -137,15 +137,14 @@ def main():
         print(f"💾 Log salvo: {arq}")
         return
     
-    # Carregar Docling
-    print("\n⏳ Carregando Docling...")
+    # Carregar PyMuPDF
+    print("\n⏳ Carregando PyMuPDF...")
     t_load_start = time.perf_counter()
-    
-    from docling.document_converter import DocumentConverter
-    converter = DocumentConverter()
-    
+
+    import fitz  # PyMuPDF
+
     t_load = time.perf_counter() - t_load_start
-    print(f"✅ Docling carregado em {t_load:.1f}s")
+    print(f"✅ PyMuPDF carregado em {t_load:.1f}s")
     
     # Extrair novos
     extraidos = 0
@@ -158,16 +157,23 @@ def main():
     
     for pdf in tqdm(novos, desc="Extraindo", unit="doc"):
         try:
-            resultado = converter.convert(str(pdf))
-            texto_completo = resultado.document.export_to_markdown()
-            
+            # Abrir PDF com PyMuPDF
+            doc = fitz.open(str(pdf))
+            texto_completo = ""
+
+            # Extrair texto de todas as páginas
+            for page in doc:
+                texto_completo += page.get_text()
+
+            doc.close()
+
             doc_data = salvar_extracao(pdf, texto_completo, len(texto_completo))
-            
+
             extraidos += 1
             total_bytes += doc_data["tamanho_bytes"]
             total_tokens += doc_data["tokens_estimados"]
             total_chars += doc_data["texto_truncado_chars"]
-            
+
         except Exception as e:
             salvar_erro(pdf, str(e))
             erros += 1
@@ -236,7 +242,7 @@ def main():
         },
         "metricas": {
             "tempo_total_s": round(t_total, 2),
-            "tempo_carga_docling_s": round(t_load, 2),
+            "tempo_carga_pymupdf_s": round(t_load, 2),
             "tempo_medio_por_doc_s": round(segundos_por_doc, 3),
             "docs_hora": round(docs_hora, 0)
         },
